@@ -96,7 +96,7 @@ namespace MTE380TraversalLogic
                 motorLeftSpeed = MotorSpeed.SlowForward;
                 motorRightSpeed = MotorSpeed.SlowBackward;
             } else {
-                // turn left if needed
+                // turn right if needed
                 motorLeftSpeed = MotorSpeed.SlowBackward;
                 motorRightSpeed = MotorSpeed.SlowForward;
             }
@@ -112,17 +112,14 @@ namespace MTE380TraversalLogic
             stopRobot();
             driveForward();
         }
-
-        // simulation stuff
-        // setup stuff
+        
         static void setup()
         {
             tileDistance = 2 * getLeftSensorDistance();
             angleZero = getAngleSensor();
             turnCount = 0;
         }
-
-        // loop stuff
+        
         static void loop()
         {
             while (true)
@@ -163,9 +160,22 @@ namespace MTE380TraversalLogic
             }
         }
 
+        #region TESTING STUFF
+        static void expect(object expectedValue, object actualValue, string description = "")
+        {
+            if (description != "")
+            {
+                Console.WriteLine(description);
+            }
+            Console.WriteLine(expectedValue.Equals(actualValue) ? "SUCCESS" : "FAIL");
+        }
+        #endregion
+
         static void Main(string[] args)
         {
-
+            expect(getLeftSensorDistance(), (double)0, "LEFT DISTANCE SHOULD BE 0");
+            expect(getFrontSensorDistance(), (double)0, "FRONT DISTANCE SHOULD BE 0");
+            Console.Read();
         }
     }
 }
