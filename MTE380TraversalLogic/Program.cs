@@ -80,7 +80,6 @@ namespace MTE380TraversalLogic
         }
 
         static void rightTurnRobot(double startingAngle) {
-            Console.WriteLine("RIGHT TURN ROBOT");
             stopRobot();
 
             motorLeftSpeed = MotorSpeed.NormalForward;
@@ -89,9 +88,6 @@ namespace MTE380TraversalLogic
             double angle = getAngleSensor();
             while (angle < (startingAngle % 360) + 90) {
                 angle = getAngleSensor();
-                var temp = angle % 360;
-                var temp2 = (startingAngle % 360) + 90;
-                var temp3 = angle % 360 < (startingAngle % 360) + 90;
 
                 if (isTesting)
                 {
@@ -233,28 +229,23 @@ namespace MTE380TraversalLogic
             {
                 while (simulationRunning)
                 {
+                    // simulation for movement of motors when both are set to move forward
                     if ((motorLeftSpeed == MotorSpeed.NormalForward && motorRightSpeed == MotorSpeed.NormalForward) ||
                     (motorLeftSpeed == MotorSpeed.SlowForward && motorRightSpeed == MotorSpeed.SlowForward))
                     {
-                        // Console.WriteLine("DRIVING FORWARD");
                         setFrontDistanceSensor(getFrontSensorDistance() - (motorLeftSpeed == MotorSpeed.NormalForward ? 0.01 : 0.005));
-                    } else
-                    {
-                        var temp = motorLeftSpeed;
                     }
+                    // TODO: Remove this!! Workaround for weirdness with simulation
                     Console.WriteLine($"TURN COUNT: {turnCount}");
                 }
             });
-            Console.WriteLine("MADE IT PAST TASK");
         }
         static void simulationTurnRight()
         {
-            var temp = getAngleSensor();
-            Console.WriteLine($"ANGLE SENSOR: {temp}");
             // update left sensor
             if (turnCount == 2 || turnCount == 6 || turnCount == 9)
             {
-                leftSensorDistance += tileDistance;
+                setLeftDistanceSensor(getLeftSensorDistance() + tileDistance);
             }
 
             // update front sensor
@@ -268,7 +259,10 @@ namespace MTE380TraversalLogic
             {
                 setFrontDistanceSensor(3.5 * tileDistance);
             }
-            Console.WriteLine($"TURN RIGHT!! NEW LEFT DISTANCE AFTER TURN: {leftSensorDistance}");
+            string turnCountDisplay = turnCount == 0 ? "1st" : 
+                (turnCount == 1 ? "2nd" : 
+                (turnCount == 2 ? "3rd" : $"{turnCount}th"));
+            Console.WriteLine($"{turnCountDisplay} TURN!! LEFT DISTANCE AFTER: {getLeftSensorDistance()}, FRONT DISTANCE AFTER: {getFrontSensorDistance()}");
         }
         #endregion
 
@@ -276,11 +270,9 @@ namespace MTE380TraversalLogic
         {
             isTesting = true;
             Console.WriteLine("UNIT TESTS");
-            Console.WriteLine();
 
             // check defaults
             Console.WriteLine("DEFAULTS");
-            Console.WriteLine();
 
             expect(getAngleSensor(), (double)0, "ANGLE SENSOR SHOULD BE 0");
             expect(getLeftSensorDistance(), (double)0, "LEFT DISTANCE SHOULD BE 0");
@@ -289,7 +281,6 @@ namespace MTE380TraversalLogic
 
             // check setup
             Console.WriteLine("SETUP");
-            Console.WriteLine();
 
             setAngleSensor(0.1);
             setLeftDistanceSensor(1);
@@ -303,29 +294,30 @@ namespace MTE380TraversalLogic
 
             // check drive forward
             Console.WriteLine("DRIVE FORWARD");
-            Console.WriteLine();
+
             expect(motorLeftSpeed, MotorSpeed.Stop, "MOTOR LEFT SHOULD BE INITIALLY STOPPED");
             expect(motorRightSpeed, MotorSpeed.Stop, "MOTOR RIGHT SHOULD BE INITIALLY STOPPED");
             driveForward();
             expect(motorLeftSpeed, MotorSpeed.NormalForward, "MOTOR LEFT SPEED SHOULD BE NORMAL FORWARD");
             expect(motorRightSpeed, MotorSpeed.NormalForward, "MOTOR RIGHT SPEED SHOULD BE NORMAL FORWARD");
+            Console.WriteLine();
 
             // check stop
             Console.WriteLine("STOP ROBOT");
-            Console.WriteLine();
+
             stopRobot();
             expect(motorLeftSpeed, MotorSpeed.Stop, "MOTOR LEFT SHOULD BE STOPPED");
             expect(motorRightSpeed, MotorSpeed.Stop, "MOTOR RIGHT SHOULD BE STOPPED");
+            Console.WriteLine();
 
             // loop
             Console.WriteLine("STARTING SIMULATION");
-            Console.WriteLine();
+
             loop();
             expect(turnCount, 10, "TURNING COUNT SHOULD BE 10 AFTER END");
             expect(getLeftSensorDistance(), 3.5*tileDistance, "LEFT SENSOR SHOULD BE 3.5 * TILE DISTANCE");
             expect(motorLeftSpeed, MotorSpeed.Stop, "MOTOR LEFT SHOULD BE STOPPED");
             expect(motorRightSpeed, MotorSpeed.Stop, "MOTOR RIGHT SHOULD BE STOPPED");
-
 
             Console.Read();
         }
